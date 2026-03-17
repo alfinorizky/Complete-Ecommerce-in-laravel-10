@@ -29,7 +29,7 @@
             <td>{{$order->first_name}} {{$order->last_name}}</td>
             <td>{{$order->email}}</td>
             <td>{{$order->quantity}}</td>
-            <td>${{$order->shipping->price}}</td>
+            <td>${{ $order->shipping ? $order->shipping->price : '0' }}</td>
             <td>${{number_format($order->total_amount,2)}}</td>
             <td>
                 @if($order->status=='new')
@@ -78,11 +78,8 @@
                         <td> : {{$order->status}}</td>
                     </tr>
                     <tr>
-                      @php
-                          $shipping_charge=DB::table('shippings')->where('id',$order->shipping_id)->pluck('price');
-                      @endphp
                         <td>Shipping Charge</td>
-                        <td> :${{$order->shipping->price}}</td>
+                        <td> :${{ $order->shipping ? $order->shipping->price : '0' }}</td>
                     </tr>
                     <tr>
                         <td>Total Amount</td>
@@ -134,6 +131,55 @@
         </div>
       </div>
     </section>
+
+    {{-- PRODUCT LIST --}}
+    <section class="mt-4">
+        <h4 class="text-center pb-3">ORDER PRODUCTS</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Photo</th>
+                        <th>Product Name</th>
+                        <th>Unit Price</th>
+                        <th>Qty</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($order->cart_info as $i => $item)
+                    <tr>
+                        <td>{{ $i + 1 }}</td>
+                        <td>
+                            @php $photo = $item->product_photo ?? optional($item->product)->photo; @endphp
+                            @if($photo)
+                                <img src="{{ asset($photo) }}" style="width:50px;height:50px;object-fit:cover;border-radius:4px">
+                            @else
+                                <span class="text-muted">No image</span>
+                            @endif
+                        </td>
+                        <td>{{ $item->product_name ?? optional($item->product)->title ?? 'Product deleted' }}</td>
+                        <td>${{ number_format($item->price, 2) }}</td>
+                        <td>{{ $item->quantity }}</td>
+                        <td>${{ number_format($item->amount, 2) }}</td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">No products found.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="5" class="text-right">Total</th>
+                        <th>${{ number_format($order->total_amount, 2) }}</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </section>
+
     @endif
 
   </div>

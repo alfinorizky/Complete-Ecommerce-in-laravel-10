@@ -49,21 +49,18 @@ A full-fledged **eCommerce solution** built on **Laravel 10**, featuring a moder
 ## 🛠️ Installation Guide
 
 ### 🔹 **Step 1: Clone the Repository**
-
 ```sh
 git clone https://github.com/Prajwal100/Complete-Ecommerce-in-laravel-10.git
 cd Complete-Ecommerce-in-laravel-10
 ```
 
 ### 🔹 **Step 2: Install Dependencies**
-
 ```sh
 composer install
 npm install
 ```
 
 ### 🔹 **Step 3: Environment Setup**
-
 ```sh
 cp .env.example .env
 php artisan key:generate
@@ -72,7 +69,6 @@ php artisan key:generate
 Update `.env` with your database credentials, PayPal settings, and social login configurations.
 
 ### 🔹 **Step 4: Database Configuration**
-
 ```sh
 php artisan migrate --seed
 ```
@@ -80,13 +76,11 @@ php artisan migrate --seed
 **Note:** The seeder will create the admin user. Alternatively, you can import `database/e-shop.sql` manually.
 
 ### 🔹 **Step 5: Setup Storage**
-
 ```sh
 php artisan storage:link
 ```
 
 ### 🔹 **Step 6: Run the Application**
-
 ```sh
 php artisan serve
 ```
@@ -180,3 +174,31 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 🔹 This project is **MIT Licensed** – Feel free to use & modify!
 
 ⭐ **If you find this project helpful, don't forget to star it!** ⭐
+
+---
+
+## 📝 Implementation Notes
+
+### Changes Made
+
+**1. Order Product List on Order Detail**
+- Updated `HomeController@orderShow` to eager-load `cart_info.product` relation
+- Added product list table to `resources/views/user/order/show.blade.php`
+- Added product list table to `resources/views/backend/order/show.blade.php`
+
+**2. Order Detail Immutability After Product Edit/Delete**
+- Added migration to add `product_name` and `product_photo` snapshot columns to `carts` table
+- Changed `product_id` foreign key from `onDelete CASCADE` to `onDelete SET NULL`
+- Updated `OrderController@store` and `PaypalController` to snapshot product data at order-creation time
+- View uses snapshot as primary source, live product data as fallback
+
+---
+
+## 💡 Suggestions
+
+1. **Pisahkan tabel order_items** — gunakan tabel `order_items` tersendiri, jangan campur dengan `carts`
+2. **Soft deletes pada products** — gunakan `SoftDeletes` agar data historis tetap ada
+3. **Authorization di order show** — pastikan order yang diakses milik user yang login (cegah IDOR)
+4. **Validasi stok di cart update** — cek stok saat qty diubah, bukan hanya saat add to cart
+5. **Perbaiki admin order detail** — `backend/order/show.blade.php` sudah diperbaiki dengan menambahkan product list
+6. **Gunakan database transaction** — proses order sebaiknya dibungkus `DB::transaction()` agar atomic

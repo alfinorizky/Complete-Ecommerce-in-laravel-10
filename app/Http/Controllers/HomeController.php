@@ -35,12 +35,10 @@ class HomeController extends Controller
 
     public function profile(){
         $profile=Auth()->user();
-        // return $profile;
         return view('user.users.profile')->with('profile',$profile);
     }
 
     public function profileUpdate(Request $request,$id){
-        // return $request->all();
         $user=User::findOrFail($id);
         $data=$request->all();
         $status=$user->fill($data)->save();
@@ -58,6 +56,7 @@ class HomeController extends Controller
         $orders=Order::orderBy('id','DESC')->where('user_id',auth()->user()->id)->paginate(10);
         return view('user.order.index')->with('orders',$orders);
     }
+
     public function userOrderDelete($id)
     {
         $order=Order::find($id);
@@ -84,10 +83,10 @@ class HomeController extends Controller
 
     public function orderShow($id)
     {
-        $order=Order::find($id);
-        // return $order;
-        return view('user.order.show')->with('order',$order);
+        $order = Order::with(['cart_info.product', 'shipping'])->findOrFail($id);
+        return view('user.order.show')->with('order', $order);
     }
+
     // Product Review
     public function productReviewIndex(){
         $reviews=ProductReview::getAllUserReview();
@@ -97,7 +96,6 @@ class HomeController extends Controller
     public function productReviewEdit($id)
     {
         $review=ProductReview::find($id);
-        // return $review;
         return view('user.review.edit')->with('review',$review);
     }
 
@@ -152,6 +150,7 @@ class HomeController extends Controller
         $comments=PostComment::getAllUserComments();
         return view('user.comment.index')->with('comments',$comments);
     }
+
     public function userCommentDelete($id){
         $comment=PostComment::find($id);
         if($comment){
@@ -169,6 +168,7 @@ class HomeController extends Controller
             return redirect()->back();
         }
     }
+
     public function userCommentEdit($id)
     {
         $comments=PostComment::find($id);
@@ -193,7 +193,6 @@ class HomeController extends Controller
         $comment=PostComment::find($id);
         if($comment){
             $data=$request->all();
-            // return $data;
             $status=$comment->fill($data)->update();
             if($status){
                 request()->session()->flash('success','Comment successfully updated');
@@ -207,12 +206,12 @@ class HomeController extends Controller
             request()->session()->flash('error','Comment not found');
             return redirect()->back();
         }
-
     }
 
     public function changePassword(){
         return view('user.layouts.userPasswordChange');
     }
+
     public function changPasswordStore(Request $request)
     {
         $request->validate([
@@ -225,6 +224,4 @@ class HomeController extends Controller
    
         return redirect()->route('user')->with('success','Password successfully changed');
     }
-
-    
 }

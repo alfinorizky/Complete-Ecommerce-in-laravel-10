@@ -245,9 +245,17 @@ class PaypalController extends Controller
                 strtoupper($paymentResponse['status']) === 'COMPLETED') {
                 
                 // Payment successful - NOW link cart items to order
-                Cart::where('user_id', auth()->user()->id)
-                    ->where('order_id', null)
-                    ->update(['order_id' => $order->id]);
+$pendingCarts = Cart::with('product')
+    ->where('user_id', auth()->user()->id)
+    ->where('order_id', null)
+    ->get();
+
+foreach ($pendingCarts as $cartItem) {
+    $cartItem->order_id      = $order->id;
+    $cartItem->product_name  = $cartItem->product ? $cartItem->product->title : 'N/A';
+    $cartItem->product_photo = $cartItem->product ? $cartItem->product->photo : null;
+    $cartItem->save();
+}
                 
                 // Update order payment status
                 $order->payment_status = 'paid';
