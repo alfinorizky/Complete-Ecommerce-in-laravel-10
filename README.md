@@ -192,6 +192,16 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - Updated `OrderController@store` and `PaypalController` to snapshot product data at order-creation time
 - View uses snapshot as primary source, live product data as fallback
 
+### 📸 Proof: Before & After Product Edit
+
+**BEFORE** — Order detail sebelum product diedit (nama produk: Kipas):
+
+![Before](https://github.com/user-attachments/assets/f7b5fa11-5781-437e-bcd6-c1e1a72740f4)
+
+**AFTER** — Admin mengubah nama produk menjadi "Kipas edite", tapi order detail tetap menampilkan "Kipas":
+
+![After](https://github.com/user-attachments/assets/6a121253-af25-4734-b57d-8060aa1b126c)
+
 ---
 
 ## 💡 Suggestions
